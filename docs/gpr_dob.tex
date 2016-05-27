@@ -1,0 +1,209 @@
+\documentclass[10pt,oneside,a4paper,notitlepage]{article}
+
+
+\usepackage{float}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{xcolor}
+\usepackage{xfrac}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+
+
+\usepackage{pgfplots}
+
+\usepackage{pdflscape}
+
+\newcommand{\vect}[1]{\mathbf{#1}}
+\setcounter{MaxMatrixCols}{20}
+\addtolength{\hoffset}{-10mm} \addtolength{\textwidth}{20mm}
+\addtolength{\voffset}{-10mm} \addtolength{\textheight}{20mm}
+%\renewcommand*\rmdefault{ppl}
+
+\usepackage{natbib}
+
+\begin{document}
+\begin{center}
+% Title
+\begin{Large}
+Gaussian Processes with Derivative Observations
+\end{Large}
+\\
+\vspace{4mm}
+Xiaoke Yang\hspace{1em}(\texttt{das.xiaoke@hotmail.com}) \\
+School of Automation Science and Electrical Engineering, \\
+Beihang University
+\end{center}
+\vspace{4mm}
+\textbf{Abstract}: This article summarises necessary derivations for Gaussian processes (GP) with derivative observations. Please refer to `Solak et al, Derivative observations in Gaussian Process models of dynamic systems.' for more details on derivative observations. Uncertainties over derivative observations are not considered in this article. 
+
+\section{Preliminary}
+Assume the underlying system is modelled by a multiple-input single-output function with noisy measurements of the output, i.e.
+\begin{align}
+y = f(\vect x) + v,
+\end{align}
+where $\vect x\in\mathbb R^D$, $y\in\mathbb R$, and $v$ is an additive Gaussian noise, i.e. $v\sim\mathcal N(0, v)$. The underlying function $f(\vect x)$ is modelled by a GP, i.e. 
+\begin{align}
+f\sim\mathcal{GP}(m(\vect x), k(\vect x^m, \vect x^n)).
+\end{align}
+A zero mean function $m(\vect x) = 0$ is used for the GP and the following covariance function is used
+\begin{align}
+\label{eq:kxx}
+\mathrm{cov}[y^m, y^n] = k(\vect x^m, \vect x^n) = \alpha\exp\left(-\frac{1}{2}\|\vect x^m - \vect x^n\|_{\boldsymbol{\Gamma}}^2\right) + v\delta_{m,n}
+\end{align}
+where $\vect x^m, \vect x^n\in\mathbb R^D$ are two input points, $\boldsymbol{\Gamma} = \mathrm{diag}\left(\begin{bmatrix}\gamma_1&\gamma_2&\cdots&\gamma_D\end{bmatrix}\right)$, notation $\|\cdot\|_{\boldsymbol\Gamma}$ is defined as $\|\vect x\|^2_{\boldsymbol{\Gamma}} \triangleq \vect x^\top \boldsymbol\Gamma \vect x $, and the Kronecker delta is defined as
+\begin{align}
+\delta_{m,n}=\left\{\begin{matrix}1 & m=n\\ 0 & m\neq n\end{matrix}\right. .
+\end{align}
+
+We also define another covariance function for convenience,
+\begin{align}
+k_f(\vect x^m, \vect x^n) = \alpha\exp\left(-\frac{1}{2}\|\vect x^m - \vect x^n\|_{\boldsymbol{\Gamma}}^2\right). 
+\end{align}
+Basically, $k_f(\vect x^m, \vect x^n)$ calculates the covariance between the function values, instead of the measurements of the function outputs. The vector of hyper-parameters is defined as 
+\begin{align}
+\boldsymbol\theta = \begin{bmatrix}\gamma_1 & \gamma_2 & \cdots & \gamma_D & \alpha & v\end{bmatrix}.
+\end{align}
+\section{Derivative Observations}
+With derivative observations, data for the GP become
+\begin{table}[!h]
+\caption{Input-output data for GP }
+\centering
+\begin{tabular}{ccc}
+\hline
+Type & Derivative observation & Function observation \\
+\hline
+input & $\vect x_d\in\mathbb R^D$ & $\vect x\in\mathbb R^D$ \\
+output & $\vect y_d\in\mathbb R^D$ & $y\in\mathbb R$\\
+\hline
+\end{tabular}
+\end{table}
+
+If we define the input output data block as 
+\begin{align}
+\vect X &= \begin{bmatrix}\vect x_d^1 & \vect x_d^2 & \cdots & \vect x_d^M & \vect x^1 & \vect x^2 & \cdots & \vect x^N  \end{bmatrix} \\
+\vect Y &= \begin{bmatrix} (\vect y_d^1)^\top &  (\vect y_d^2)^\top & \cdots &  (\vect y_d^M)^\top &  y^1 &  y^2 & \cdots &  y^N  \end{bmatrix}
+\end{align}
+
+Then the output covariance matrix is
+\begin{align}
+\vect K = \begin{bmatrix}
+\begin{bmatrix} \cdots & \cdots & \cdots \\ \cdots & k_{dd}(\vect x_d^m, \vect x_d^n) & \cdots \\ \cdots & \cdots & \cdots \end{bmatrix}_{\begin{subarray}{l}m\in\{1,\ldots,M\}\\ n\in\{1,\ldots,M\}\end{subarray}} & 
+\begin{bmatrix} \cdots & \cdots & \cdots \\ \cdots & k_{dx}(\vect x_d^m, \vect x^n) & \cdots \\ \cdots & \cdots & \cdots \end{bmatrix}_{\begin{subarray}{l}m\in\{1,\ldots,M\}\\ n\in\{1,\ldots,N\}\end{subarray}}\\ 
+\begin{bmatrix} \cdots & \cdots & \cdots \\ \cdots & k_{xd}(\vect x^m, \vect x_d^n) & \cdots \\ \cdots & \cdots & \cdots \end{bmatrix}_{\begin{subarray}{l}m\in\{1,\ldots,N\}\\ n\in\{1,\ldots,M\}\end{subarray}} & 
+\begin{bmatrix} \cdots & \cdots & \cdots \\ \cdots & k_{xx}(\vect x^m, \vect x^n) & \cdots \\ \cdots & \cdots & \cdots \end{bmatrix}_{\begin{subarray}{l}m\in\{1,\ldots,N\}\\ n\in\{1,\ldots,N\}\end{subarray}} 
+\end{bmatrix}
+\end{align}
+Things we need to compute include $k_{xx}(\vect x^m, \vect x^n)\in\mathbb R$, $k_{dx}(\vect x_d^m, \vect x^n)\in\mathbb R^{D\times 1}$, and $k_{dd}(\vect x_d^m, \vect x_d^n)\in\mathbb R^{D\times D}$.
+$k_{xx}(\vect x^m, \vect x^n)=k(\vect x^m, \vect x^n)$ as in \eqref{eq:kxx}. For the two derivatives
+The following results are from reference \cite{}.
+\begin{align}
+k_{dx}(\vect x_d^m, \vect x^n)_i &= -\alpha\gamma_i(x_{d,i}^m - x_{i}^n) \exp\left(-\frac{1}{2}\|\vect x_d^m - \vect x^n\|_{\boldsymbol{\Gamma}}^2\right),\\
+&= -\gamma_i(x_{d,i}^m - x_{i}^n) k_f(\vect x_d^m, \vect x^n) , \\ 
+k_{dd}(\vect x_d^m, \vect x_d^n)_{i,j} &= \alpha\gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)\exp\left(-\frac{1}{2}\|\vect x_d^m - \vect x_d^n\|_{\boldsymbol{\Gamma}}^2\right), \\
+&= \gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)k_f(\vect x_d^m, \vect x_d^n), \\
+\end{align}
+where the subscripts $i$ and $j$ corresponds to the indices within the array or matrix, respectively. and 
+\begin{align}
+k_f(\vect x_d^m, \vect x^n) =  \exp\left(-\frac{1}{2}\|\vect x_d^m - \vect x^n\|_{\boldsymbol{\Gamma}}^2\right) = k_f(\vect x^n, \vect x_d^m) 
+\end{align}
+Then, in vector and matrix form, the above equations can be written as
+\begin{align}
+k_{dx}(\vect x_d^m, \vect x^n)&= - k_f(\vect x_d^m, \vect x^n)\boldsymbol\Gamma (\vect x_d^m - \vect x^n),\\ 
+k_{dd}(\vect x_d^m, \vect x_d^n) &= k_f(\vect x_d^m, \vect x_d^n)\left(\boldsymbol\Gamma - \left(\boldsymbol\Gamma(\vect x_d^m - \vect x_d^n)\right) \left(\boldsymbol\Gamma(\vect x_d^m - \vect x_d^n)\right)^\top\right) , \\
+&= k_f(\vect x_d^m, \vect x_d^n)\left(\boldsymbol\Gamma  - \boldsymbol\Gamma (\vect x_d^m - \vect x_d^n)(\vect x_d^m - \vect x_d^n)^\top\boldsymbol\Gamma\right) ,
+\end{align}
+The GP predictions are
+\begin{align}
+p(y^* | \vect X, \vect Y, \vect x^*) &\sim \mathcal N(\mu,\Sigma)\\
+\end{align}
+where 
+\begin{align}
+\mu &= k(\vect x^*, \vect X) \vect K^{-1} \vect Y\\
+\Sigma &= k(\vect x^*, \vect x^*) - k(\vect x^*, \vect X) \vect K^{-1} k(\vect X, \vect x^*)
+\end{align}
+where
+\begin{align}
+k(\vect x^*, \vect X) &= \begin{bmatrix} [k_{xd}(\vect x^*, \vect x_d^m)]_{m\in\{1,\ldots,M\}} & [k_{xx}(\vect x^*, \vect x^n)]_{n\in\{1,\ldots,N\}} \end{bmatrix} \\
+k(\vect X, \vect x^*) &= k(\vect x^*, \vect X)^\top 
+\end{align}
+
+and the marginal likelihood is
+\begin{align}
+L = \log p(\vect Y|\vect X) = -\frac{1}{2}\vect Y^\top \vect K^{-1}\vect Y - \frac{1}{2}\log|\vect K| - \frac{MD+N}{2}\log2\pi
+\end{align}
+
+In order to train the GP, the derivative $\frac{\partial L}{\partial\boldsymbol\theta}$ needs to be computed, and are listed as follows.
+\begin{align}
+\frac{\partial L }{\partial\theta_l} = \mathrm{vec}\left(\frac{\partial L}{\partial\vect K}\right)^\top\mathrm{vec}\left(\frac{\partial\vect K}{\partial \theta_l}\right) , \quad l\in\{1,2,\ldots,D+2\},
+\end{align}
+where $\circ$ denotes the matrix Hadamard product or element-wise product. 
+The first half of this product is a $(MD+N)\times(MD+N)$ matrix, whose $i,j^\mathrm{th}$ element is defined as $\frac{\partial L}{\partial K_{i,j}}$
+\begin{align}
+\frac{\partial L }{\partial \vect K} = \begin{bmatrix} \cdots & \cdots & \cdots \\ \cdots & \frac{\partial L}{\partial K_{i,j}} & \cdots \\ \cdots & \cdots & \cdots \end{bmatrix}_{\begin{subarray}{l}i\in\{1,\ldots,MD+N\}\\ j\in\{1,\ldots,MD+N\}\end{subarray}} 
+\end{align}
+from matrix cookbook
+\begin{align}
+\frac{\partial L}{\partial \vect K} =  \frac{1}{2}\vect K^{-\top}\vect Y\vect Y^T\vect K^{-\top} - \frac{1}{2} \vect K^{-\top}
+\end{align}
+Then we need to compute the right half of the product, i.e. $\frac{\partial \vect K}{\partial \theta_l}$, we still divide this into 4 blocks, in accordance with the definition of $\vect K$.
+\begin{align}
+\frac{\partial k_{xx}(\vect x^m, \vect x^n)}{\partial\theta_l}= \frac{\partial k_f(\vect x^m, \vect x^n)}{\partial\theta_l} &= \alpha\exp\left(-\frac{1}{2}\|\vect x^m - \vect x^n\|_{\boldsymbol\Gamma}^2\right)\frac{\partial\left(-\frac{1}{2}(\vect x^m - \vect x^n)^\top\boldsymbol\Gamma(\vect x^m - \vect x^n)\right)}{\partial\theta_l}, \\
+&=k_f(\vect x^m, \vect x^n) \frac{\partial\left(-\frac{1}{2}\sum_{i=1}^D\gamma_i(x^m_i - x^n_i)^2\right)}{\partial\theta_l},\\ 
+&=-\frac{1}{2}k_f(\vect x^m, \vect x^n)(x^m_l - x^n_l)^2, \quad l\in\{1,\ldots,D\} \\
+\frac{\partial k_{xx}(\vect x^m, \vect x^n)}{\partial\theta_l}= \frac{\partial k_f(\vect x^m, \vect x^n)}{\partial\theta_l} &=\exp\left(-\frac{1}{2}\|\vect x^m - \vect x^n\|_{\boldsymbol\Gamma}^2\right) ,\quad l=D+1 \\
+\frac{\partial k_{xx}(\vect x^m, \vect x^n)}{\partial\theta_l}&=\delta_{m,n},\quad l=D+2 
+\end{align}
+
+In the following, $i\in\{1,\ldots, D\}$.
+\begin{align}
+\frac{\partial k_{dx}(\vect x_d^m, \vect x^n)_i}{\partial\theta_l}&=
+\frac{\partial\left(-\gamma_i(x_{d,i}^m - x_i^n)k_f(\vect x_d^m, \vect x^n)\right)}{\partial\theta_l}, \\
+&= -\gamma_i(x_{d,i}^m - x_i^n)\frac{\partial k_f(\vect x_d^m, \vect x^n)}{\partial\theta_l} - \delta_{i,l}(x_{d,i}^m - x_i^n)k_f(\vect x_d^m, \vect x^n), \quad l\in\{1,\ldots,D\} \\
+\frac{\partial k_{dx}(\vect x_d^m, \vect x^n)_i}{\partial\theta_l}&= -\gamma_i(x_{d,i}^m - x_i^n)\frac{\partial k_f(\vect x_d^m, \vect x^n)}{\partial\theta_l} , \\
+&= -\gamma_i(x_{d,i}^m - x_i^n)\exp\left(-\frac{1}{2}\|\vect x_d^m - \vect x^n\|_{\boldsymbol\Gamma}^2\right) ,\quad l=D+1, \\
+\frac{\partial k_{dx}(\vect x_d^m, \vect x^n)_i}{\partial\theta_l}&=0,\quad l=D+2 
+\end{align}
+or by using matrix differentiation, we can get the following directly from xx. 
+\begin{align}
+\frac{\partial k_{dx}(\vect x_d^m, \vect x^n)}{\partial\theta_l}&= -\boldsymbol\Gamma (\vect x_d^m - \vect x^n)\frac{\partial k_f(\vect x_d^m, \vect x^n)}{\partial\theta_l} - \boldsymbol\Delta_l(\vect x_d^m - \vect x_d^n) k_f(\vect x_d^m, \vect x_d^n), \\ 
+&= \frac{1}{2}k_f(\vect x_d^m, \vect x^n)(x_{d,l}^m - x_l^n)^2\boldsymbol\Gamma (\vect x_d^m - \vect x^n) \nonumber \\
+&\quad- \boldsymbol\Delta_l(\vect x_d^m - \vect x^n) k_f(\vect x_d^m, \vect x^n),  \quad l\in\{1,\ldots,D\}, \\ 
+\frac{\partial k_{dx}(\vect x_d^m, \vect x^n)}{\partial\theta_l}&= -\boldsymbol\Gamma (\vect x_d^m - \vect x^n)\exp\left(-\frac{1}{2}\|\vect x_d^m - \vect x^n\|_{\boldsymbol\Gamma}^2\right),  \quad l=D+1,\\ 
+\frac{\partial k_{dx}(\vect x_d^m, \vect x^n)}{\partial\theta_l}&=\vect 0_{D\times 1} \quad l=D+1,\\ 
+\end{align}
+where $\boldsymbol\Delta_l\in\mathbb R ^{D\times D}$ is a square matrix with the $l^\mathrm{th}$ diagonal element $\Delta_{l,l} = 1$ and all other elements as 0. 
+
+In the following $i\in\{1,\ldots,D\},j\in\{1,\ldots,D\}$.
+\begin{align}
+\frac{\partial k_{dd}(\vect x_d^m, \vect x_d^n)_{i,j}}{\partial\theta_l}&= \frac{\partial\left[\gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)k_f(\vect x_d^m, \vect x_d^n)\right]}{\partial\theta_l}, \\
+&= \frac{\partial\left[\gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)\right]}{\partial\theta_l}k_f(\vect x_d^m, \vect x_d^n) \nonumber \\
+&\quad+\gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)\frac{\partial k_f(\vect x_d^m, \vect x_d^n)}{\partial\theta_l},\\
+&= \left[\delta_{i,l}\delta_{j,l} - (\delta_{i,l}\gamma_j + \delta_{j,l}\gamma_i)(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right]k_f(\vect x_d^m, \vect x_d^n) \nonumber \\
+&\quad+\gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)\frac{\partial k_f(\vect x_d^m, \vect x_d^n)}{\partial\theta_l}, \quad l\in\{1,\ldots,D\}\\ 
+\frac{\partial k_{dd}(\vect x_d^m, \vect x_d^n)_{i,j}}{\partial\theta_l}&=\gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)\frac{\partial k_f(\vect x_d^m, \vect x_d^n)}{\partial\theta_l} \\
+&=\gamma_i\left(\delta_{i,j} - \gamma_j(x_{d,i}^m - x_{d,i}^n)(x_{d,j}^m - x_{d,j}^n)\right)\exp\left(-\frac{1}{2}\|\vect x_d^m - \vect x_d^n\|_{\boldsymbol\Gamma}^2\right),\quad l=D+1 \\
+\frac{\partial k_{dd}(\vect x_d^m, \vect x_d^n)_{i,j}}{\partial\theta_l}&= 0,\quad l=D+2 
+\end{align}
+
+or by using matrix differentiation, we can get the following directly from xx.
+\begin{align}
+\frac{\partial k_{dd}(\vect x_d^m, \vect x_d^n)}{\partial\theta_l}&= \left(
+\boldsymbol\Delta_l - \boldsymbol\Gamma(\vect x_d^m - \vect x_d^n)(\vect x_d^m - \vect x_d^n)^\top\boldsymbol\Delta_l - \boldsymbol\Delta_l(\vect x_d^m - \vect x_d^n)(\vect x_d^m - \vect x_d^n)^\top\boldsymbol\Gamma\right)k_f(\vect x_d^m, \vect x_d^n) \nonumber \\
+&\quad+\boldsymbol\Gamma \left(\vect I - (\vect x_d^m - \vect x_d^n)(\vect x_d^m - \vect x_d^n)^\top\boldsymbol\Gamma\right)(-\frac{1}{2}k_f(\vect x_d^m, \vect x_d^n)(x_{d,l}^m - x_{d,l}^n)^2), \quad l\in\{1,\ldots,D\}\\ 
+\frac{\partial k_{dd}(\vect x_d^m, \vect x_d^n)}{\partial\theta_l}&=\boldsymbol\Gamma \left(\vect I - (\vect x_d^m - \vect x_d^n)(\vect x_d^m - \vect x_d^n)^\top\boldsymbol\Gamma\right)\exp\left(-\frac{1}{2}\|\vect x_d^m - \vect x_d^n\|_{\boldsymbol\Gamma}^2\right),\quad l=D+1 \\
+\frac{\partial k_{dd}(\vect x_d^m, \vect x_d^n)}{\partial\theta_l}&= \vect 0_{D\times D},\quad l=D+2 
+\end{align}
+
+Note, in some cases, the parameter $\gamma_l$ take an inverse exponentiated square form of
+\begin{align}
+\gamma_l = \frac{1}{\exp(\lambda_l)^2}, \quad l\in\{1,\ldots,D\}
+\end{align}
+In this case, all the above differentiation should have one more step, i.e.
+
+\begin{align}
+\frac{\partial k(\cdot, \cdot) }{\partial\lambda_l} =  \frac{\partial k(\cdot, \cdot)}{\partial\gamma_l}\frac{\mathrm{d}\gamma_l}{\mathrm{d}\lambda_l} =  -2\exp(\lambda_{l})^{-2}\frac{\partial k(\cdot, \cdot)}{\partial\gamma_l} = -2\gamma_{l}\frac{\partial k(\cdot, \cdot)}{\partial\gamma_l} , \quad l\in\{1,\ldots,D\}.
+\end{align}
+
+\bibliographystyle{apalike}
+\bibliography{../references/gp-lpv}
+\end{document}
