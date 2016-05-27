@@ -65,14 +65,18 @@ ell = exp(loghyper(1:D));                         % characteristic length scale
 sf2 = exp(2*loghyper(D+1));                                   % signal variance
 sn2 = exp(2*loghyper(D+2));                                    % noise variance
 
+Gam = diag(1./ell(idx)).^2;              % Gamma
+Gamh = diag(1./ell(idx));                % half Gamma
+            
 if xempty   % compute covariances of derivative observations and their gradient
     K = zeros(nd*F,nd*F);
     dK = zeros(nd*F,nd*F);
     for i = 1:nd
         for j = 1:nd
-            Kij = sf2*exp(-sq_dist(diag(1./ell)*xd(i,:)',diag(1./ell)*xd(j,:)')/2);
-            tmp = diag(1./ell(idx)).^2*(xd(i,idx)-xd(j,idx))';
-            coef = diag(1./ell(idx)).^2-tmp*tmp';
+            Kij = sf2*exp(-sq_dist(Gamh*xd(i,idx)',Gamh*xd(j,idx)')/2);  % Kf
+            xdif = (xd(i,idx)-xd(j,idx))';           % x difference 
+            xdifs = (xdif*xdif');                    % square
+            coef = Gam - Gam*xdifs*Gam;              % coefficient of Kf
             K((i-1)*F+1:i*F,(j-1)*F+1:j*F) = coef*Kij;
             if l == D+2                  % d. w.r.t. loghyper(D+2), zero matrix
             elseif l == D+1                           % d. w.r.t. loghyper(D+1)
@@ -80,12 +84,11 @@ if xempty   % compute covariances of derivative observations and their gradient
             else                                      % d. w.r.t. loghyper(1:D)
                 Delta_l = zeros(F,1); Delta_l(idx==l) = 1;
                 Delta_l = diag(Delta_l);
-                coef1 = Delta_l - Delta_l*(tmp*tmp')*diag(ell(idx)).^2 ;
-                coef1 = coef1 - diag(ell(idx)).^2*(tmp*tmp')*Delta_l;
+                coef1 = Delta_l - Delta_l*xdifs*Gam - Gam*xdifs*Delta_l;
                 coef2 = coef*(-1/2*(xd(i,l)-xd(j,l))^2);
                 dK1 = coef1*Kij;
                 dK2 = coef2*Kij;
-                dK((i-1)*F+1:i*F,(j-1)*F+1:j*F) = -2*(dK1+dK2)*ell(l)^(-2);
+                dK((i-1)*F+1:i*F,(j-1)*F+1:j*F) = -2*ell(l)^(-2)*(dK1+dK2);
             end
         end
     end
@@ -95,8 +98,8 @@ else % compute cross-covariances between derivative and output and the gradient
     dK = zeros(nd*F,n);
     for i = 1:nd
         for j = 1:n
-            Kij = sf2*exp(-sq_dist(diag(1./ell)*xd(i,:)',diag(1./ell)*x(j,:)')/2);
-            coef = -diag(1./ell(idx)).^2*(xd(i,idx)'-x(j,idx)');
+            Kij = sf2*exp(-sq_dist(Gamh*xd(i,idx)',Gamh*x(j,idx)')/2);  % Kf
+            coef = -Gam*(xd(i,idx)'-x(j,idx)');
             K((i-1)*F+1:i*F,j) = coef*Kij;
             if l == D+2                  % d. w.r.t. loghyper(D+2), zero matrix
             elseif l == D+1
