@@ -15,9 +15,8 @@ function [out1, out2, out3, out4] = gpr_dob(logtheta, x, y, xd, dy, idx, xstar)
 % test targets; if you want the variance of the noise-free latent function, you
 % must substract the noise variance.
 %
-% usage: [nlml dnlml] = gpr(logtheta, covfunc, x, y, xd, dy)
-%    or: [mu S2]  = gpr(logtheta, covfunc, x, y, xd, dy, xstar)
-
+% usage: [nlml dnlml] = gpr(logtheta, covfunc, x, y)
+%    or: [mu S2]  = gpr(logtheta, covfunc, x, y, xstar)
 %
 % where:
 %
@@ -40,11 +39,11 @@ function [out1, out2, out3, out4] = gpr_dob(logtheta, x, y, xd, dy, idx, xstar)
 % In order to incorporate derivative observations, the following modifications
 % are made.
 % input added:
-%   xd	     is a nd by D matrix of training inputs where derivatives are
-%		observed.
+%   xd	     is a nd by D matrix of training inputs at which derivative
+%		observations are available.
 %   dy	     is a column vector of ndxD by 1 of derivatives at xd.
 %   idx	     is a subvector of [1:D], determining the dimensions of x 
-%	       along whichhave derivative observations are available.
+%	       along which derivative observations are available.
 %
 % input deleted:
 %   covfunc is fixed to covSEard + covNoise

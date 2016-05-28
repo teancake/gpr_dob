@@ -1,4 +1,4 @@
-% This program test the one dimensional case of gpr_dob.m which implements Gaussian
+% This program tests the one dimensional case of gpr_dob.m which implements Gaussian
 % process regression with derivative observations.
 %
 % Xiaoke Yang <das.xiaoke@hotmail.com> (2016-02-17)
