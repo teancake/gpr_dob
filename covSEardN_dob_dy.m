@@ -50,7 +50,8 @@ function [K, dK] = covSEardN_dob_dy(loghyper, xd, x, l, idx)
 % Xiaoke Yang <das.xiaoke@hotmail.com> (2016-02-17)
 
 
-if nargin < 2, K = '(D+2)'; return; end          % report number of parameters
+if nargin < 2, K = '(D+2)'; return; end	    % report number of parameters
+if isempty(xd), K=[]; dK=[]; return; end    % check whether xd is empty or not
 xempty = isempty(x);
 lempty = isempty(l);
 [nd, D] = size(xd);
