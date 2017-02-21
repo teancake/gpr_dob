@@ -7,3 +7,4 @@ This program uses and adapts some of the programs in the [GPML toolbox](http://w
 
 This program can be used without restrictions. But since it is not extensively tested, errors may still exist, so please run with due care and report to me if there are errors found. 
 
+If you come across this repository through my IEEE CGNCC 2016 paper, please go to the [gpr_dob_map](https://github.com/teancake/gpr_dob_map) repository for the source code.
