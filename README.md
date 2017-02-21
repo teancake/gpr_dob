@@ -7,9 +7,3 @@ This program uses and adapts some of the programs in the [GPML toolbox](http://w
 
 This program can be used without restrictions. But since it is not extensively tested, errors may still exist, so please run with due care and report to me if there are errors found. 
 
-If you found this program helpful and are using it for your research, please cite the following publication if possible.
-
-[X. Yang, B. Peng, H. Zhou, and L. Yang, State Estimation for Nonlinear Dynamic Systems using Gaussian Processes and Pre-computed Local Linear Models, In Proceedings of the 2016 IEEE Chinese Guidance, Navigation and Control Conference, 2016, China.] (http://ieeexplore.ieee.org/document/7829090/) 
-
-This paper also has its [source code] (https://github.com/teancake/gpr_dob_bf "Bayesian filter using Gaussian process regression model and derivative observations") availabe on github.
-
